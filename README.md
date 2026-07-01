@@ -50,6 +50,17 @@ node scripts/build-chrome-package.mjs
 提出用 ZIP は `dist/youtube-grid-customizer-chrome.zip` に作成されます。
 登録時に必要な説明文や権限理由の下書きは `STORE_SUBMISSION.md` を参照してください。
 
+### Firefox 提出用パッケージ
+
+Firefox Add-ons に提出する ZIP / XPI は次のコマンドで作成します。
+
+```sh
+node scripts/build-firefox-package.mjs
+```
+
+提出用ファイルは `dist/youtube-grid-customizer-firefox.zip` と
+`dist/youtube-grid-customizer-firefox.xpi` に作成されます。
+
 ## 設定
 
 ツールバーの拡張機能アイコンをクリック、または
