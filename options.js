@@ -10,6 +10,7 @@
     blockChannelKeywords: [],
     caseSensitive: false,
     hideShorts: false,
+    hideGameRoom: false,
   };
 
   const api = typeof browser !== "undefined" ? browser : chrome;
@@ -26,9 +27,17 @@
       $("searchColumns").value = s.searchColumns;
       $("caseSensitive").checked = !!s.caseSensitive;
       $("hideShorts").checked = !!s.hideShorts;
+      $("hideGameRoom").checked = !!s.hideGameRoom;
       $("blockTitleKeywords").value = toLines(s.blockTitleKeywords);
       $("blockChannelKeywords").value = toLines(s.blockChannelKeywords);
     });
+  }
+
+  function showVersion() {
+    if (!api.runtime || !api.runtime.getManifest) return;
+    const manifest = api.runtime.getManifest();
+    const version = manifest.version_name || manifest.version;
+    if (version) $("version").textContent = `v${version}`;
   }
 
   function toLines(v) {
@@ -50,6 +59,7 @@
       searchColumns: clamp($("searchColumns").value, 1, 8, 2),
       caseSensitive: $("caseSensitive").checked,
       hideShorts: $("hideShorts").checked,
+      hideGameRoom: $("hideGameRoom").checked,
       blockTitleKeywords: fromLines("blockTitleKeywords"),
       blockChannelKeywords: fromLines("blockChannelKeywords"),
     };
@@ -67,6 +77,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    showVersion();
     load();
     $("save").addEventListener("click", save);
   });

@@ -5,6 +5,8 @@
  *  1. トップ/登録チャンネル等のグリッド列数を増やす
  *  2. 検索結果をグリッド表示にして 1 画面あたりの表示件数を増やす
  *  3. タイトル/チャンネル名に指定キーワードを含む動画を非表示にする
+ *  4. Shorts セクション/動画カードを非表示にする
+ *  5. ゲームルームのセクションを非表示にする
  */
 (() => {
   "use strict";
@@ -17,6 +19,7 @@
     blockChannelKeywords: [], // チャンネル名に含む場合に非表示
     caseSensitive: false,
     hideShorts: false,
+    hideGameRoom: false,
   };
 
   let settings = { ...DEFAULTS };
@@ -56,6 +59,21 @@
     "#channel-name #text",
     "ytd-channel-name #text",
     ".yt-content-metadata-view-model-wiz__metadata-text",
+  ];
+
+  const SECTION_RENDERERS = [
+    "ytd-rich-section-renderer",
+    "ytd-rich-shelf-renderer",
+    "ytd-shelf-renderer",
+    "ytd-horizontal-card-list-renderer",
+  ];
+
+  const SECTION_TITLE_SELECTORS = [
+    "#title",
+    "#title-container",
+    "h2",
+    "h3",
+    "yt-formatted-string#title",
   ];
 
   const STYLE_ID = "ytgc-style";
@@ -173,13 +191,44 @@
 
   function hasAnyFilter() {
     return (
+      settings.hideShorts ||
+      settings.hideGameRoom ||
       settings.blockTitleKeywords.length > 0 ||
       settings.blockChannelKeywords.length > 0
     );
   }
 
+  function isShortsCard(card) {
+    return !!card.querySelector(
+      [
+        'a[href^="/shorts/"]',
+        'a[href*="//www.youtube.com/shorts/"]',
+        'a[href*="//youtube.com/shorts/"]',
+      ].join(",")
+    );
+  }
+
+  function sectionTitle(section) {
+    return getText(section, SECTION_TITLE_SELECTORS);
+  }
+
+  function isGameRoomSection(section) {
+    return sectionTitle(section).includes("ゲームルーム");
+  }
+
   function filterCard(card) {
     // 既に判定済みで、設定が変わっていなければスキップ
+    if (settings.hideShorts && isShortsCard(card)) {
+      card.style.display = "none";
+      card.setAttribute("data-ytgc-hidden", "ytgc-shorts");
+      return;
+    }
+
+    if (card.getAttribute("data-ytgc-hidden") === "ytgc-shorts") {
+      card.style.display = "";
+      card.removeAttribute("data-ytgc-hidden");
+    }
+
     const title = getText(card, TITLE_SELECTORS);
     const channel = getText(card, CHANNEL_SELECTORS);
     if (!title && !channel) return; // まだ読み込まれていない
@@ -197,6 +246,27 @@
     }
   }
 
+  function filterSections(root = document) {
+    if (!root.querySelectorAll) return;
+
+    root.querySelectorAll('[data-ytgc-hidden="ytgc-game-room"]').forEach((section) => {
+      if (!settings.hideGameRoom || !isGameRoomSection(section)) {
+        section.style.display = "";
+        section.removeAttribute("data-ytgc-hidden");
+      }
+    });
+
+    if (!settings.hideGameRoom) return;
+
+    const sections = root.querySelectorAll(SECTION_RENDERERS.join(","));
+    sections.forEach((section) => {
+      if (isGameRoomSection(section)) {
+        section.style.display = "none";
+        section.setAttribute("data-ytgc-hidden", "ytgc-game-room");
+      }
+    });
+  }
+
   function filterAll(root = document) {
     if (!settings.enabled || !hasAnyFilter()) {
       // フィルタ無効化: 過去に隠したものを戻す
@@ -208,6 +278,7 @@
       }
       return;
     }
+    filterSections(root);
     const cards = root.querySelectorAll
       ? root.querySelectorAll(VIDEO_RENDERERS.join(","))
       : [];

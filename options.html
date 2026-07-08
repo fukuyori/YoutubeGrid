@@ -32,6 +32,12 @@
         font-size: 13px;
         margin: 0 0 24px;
       }
+      .version {
+        color: #888;
+        font-size: 12px;
+        margin-left: 8px;
+        font-weight: 400;
+      }
       .field {
         margin-bottom: 22px;
       }
@@ -94,7 +100,7 @@
     </style>
   </head>
   <body>
-    <h1>YouTube Grid Customizer</h1>
+    <h1>YouTube Grid Customizer <span class="version" id="version"></span></h1>
     <p class="sub">YouTube の一覧表示をカスタマイズします。</p>
 
     <div class="field checks">
@@ -161,7 +167,11 @@
         </label>
         <label>
           <input type="checkbox" id="hideShorts" />
-          ショート動画のセクションを非表示にする
+          ショート動画を一覧に表示しない
+        </label>
+        <label>
+          <input type="checkbox" id="hideGameRoom" />
+          ゲームルームを表示しない
         </label>
       </div>
     </div>
