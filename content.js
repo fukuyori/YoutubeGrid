@@ -62,6 +62,7 @@
   ];
 
   const SECTION_RENDERERS = [
+    "ytd-reel-shelf-renderer",
     "ytd-rich-section-renderer",
     "ytd-rich-shelf-renderer",
     "ytd-shelf-renderer",
@@ -376,8 +377,21 @@
     return getText(section, SECTION_TITLE_SELECTORS);
   }
 
+  function isShortsSection(section) {
+    if (
+      section.matches("ytd-reel-shelf-renderer, ytd-rich-shelf-renderer[is-shorts]") ||
+      section.querySelector(
+        'ytd-reel-item-renderer, ytd-rich-shelf-renderer[is-shorts], a[href^="/shorts/"]',
+      )
+    ) {
+      return true;
+    }
+    return /(^|\s)shorts?(\s|$)/i.test(sectionTitle(section));
+  }
+
   function isGameRoomSection(section) {
-    return sectionTitle(section).includes("ゲームルーム");
+    const text = (section.textContent || "").replace(/\s+/g, " ");
+    return /ゲームルーム|YouTube\s*でプレイ|Playables/i.test(text);
   }
 
   function filterCard(card) {
@@ -388,7 +402,10 @@
       return;
     }
 
-    if (card.getAttribute("data-ytgc-hidden") === "ytgc-shorts") {
+    if (
+      !settings.hideShorts &&
+      card.getAttribute("data-ytgc-hidden") === "ytgc-shorts"
+    ) {
       card.style.display = "";
       card.removeAttribute("data-ytgc-hidden");
     }
@@ -403,7 +420,10 @@
     if (hit) {
       card.style.display = "none";
       card.setAttribute("data-ytgc-hidden", hit);
-    } else if (card.getAttribute("data-ytgc-hidden") !== null) {
+    } else if (
+      card.getAttribute("data-ytgc-hidden") !== null &&
+      card.getAttribute("data-ytgc-hidden") !== "ytgc-shorts"
+    ) {
       // 過去に非表示にしたが、設定変更で対象外になった場合は復帰
       card.style.display = "";
       card.removeAttribute("data-ytgc-hidden");
@@ -413,18 +433,23 @@
   function filterSections(root = document) {
     if (!root.querySelectorAll) return;
 
-    root.querySelectorAll('[data-ytgc-hidden="ytgc-game-room"]').forEach((section) => {
-      if (!settings.hideGameRoom || !isGameRoomSection(section)) {
+    root.querySelectorAll("[data-ytgc-hidden]").forEach((section) => {
+      const reason = section.getAttribute("data-ytgc-hidden");
+      const shouldRestore =
+        (reason === "ytgc-game-room" && !settings.hideGameRoom) ||
+        (reason === "ytgc-shorts-section" && !settings.hideShorts);
+      if (shouldRestore) {
         section.style.display = "";
         section.removeAttribute("data-ytgc-hidden");
       }
     });
 
-    if (!settings.hideGameRoom) return;
-
     const sections = root.querySelectorAll(SECTION_RENDERERS.join(","));
     sections.forEach((section) => {
-      if (isGameRoomSection(section)) {
+      if (settings.hideShorts && isShortsSection(section)) {
+        section.style.display = "none";
+        section.setAttribute("data-ytgc-hidden", "ytgc-shorts-section");
+      } else if (settings.hideGameRoom && isGameRoomSection(section)) {
         section.style.display = "none";
         section.setAttribute("data-ytgc-hidden", "ytgc-game-room");
       }
