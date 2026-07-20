@@ -77,6 +77,16 @@
   ];
 
   const STYLE_ID = "ytgc-style";
+  const SECONDARY_TOGGLE_ID = "ytgc-secondary-toggle";
+  const SECONDARY_COLLAPSED_ATTR = "data-ytgc-secondary-collapsed";
+  const SECONDARY_STORAGE_KEY = "ytgc-secondary-collapsed";
+
+  let secondaryCollapsed = false;
+  try {
+    secondaryCollapsed = localStorage.getItem(SECONDARY_STORAGE_KEY) === "true";
+  } catch (_error) {
+    // localStorage を利用できない環境では、ページを開いている間だけ状態を保持する。
+  }
 
   // ------------------------------------------------------------------
   // CSS 注入: グリッド列数 / 検索結果のグリッド化
@@ -114,6 +124,54 @@
         width: 100% !important;
         max-width: none !important;
         margin: 0 !important;
+      }
+
+      /* ---- 動画ページ右側（関連動画）の開閉 ---- */
+      ytd-watch-flexy[${SECONDARY_COLLAPSED_ATTR}] #secondary {
+        display: none !important;
+      }
+      ytd-watch-flexy[${SECONDARY_COLLAPSED_ATTR}] #primary {
+        flex: 1 1 auto !important;
+        width: 100% !important;
+        max-width: none !important;
+      }
+      #${SECONDARY_TOGGLE_ID} {
+        position: fixed;
+        z-index: 2200;
+        top: 50%;
+        width: 30px;
+        height: 52px;
+        padding: 0;
+        border: 1px solid rgba(255, 255, 255, .18);
+        border-radius: 16px 0 0 16px;
+        background: rgba(33, 33, 33, .92);
+        color: #fff;
+        font: 24px/1 Arial, sans-serif;
+        cursor: pointer;
+        transform: translateY(-50%);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
+        opacity: 0;
+        transition: opacity .15s ease;
+        overflow: visible;
+      }
+      /* 見た目は変えず、透明なホバー判定を上下左右へ広げる。 */
+      #${SECONDARY_TOGGLE_ID}::before {
+        content: "";
+        position: absolute;
+        inset: -70px -12px;
+        pointer-events: auto;
+      }
+      #${SECONDARY_TOGGLE_ID}:hover,
+      #${SECONDARY_TOGGLE_ID}:focus-visible {
+        background: #3f3f3f;
+        opacity: 1;
+      }
+      #${SECONDARY_TOGGLE_ID}:focus-visible {
+        outline: 2px solid #3ea6ff;
+        outline-offset: 2px;
+      }
+      #${SECONDARY_TOGGLE_ID}[hidden] {
+        display: none !important;
       }
     `;
 
@@ -162,6 +220,112 @@
       (document.head || document.documentElement).appendChild(el);
     }
     el.textContent = css;
+  }
+
+  // ------------------------------------------------------------------
+  // 動画ページの右カラム（secondary）開閉
+  // ------------------------------------------------------------------
+  function getWatchSecondary(watch) {
+    if (!watch) return null;
+    return (
+      watch.querySelector(":scope > #columns > #secondary.ytd-watch-flexy") ||
+      watch.querySelector("#secondary.ytd-watch-flexy")
+    );
+  }
+
+  function toggleSecondary() {
+    secondaryCollapsed = !secondaryCollapsed;
+    try {
+      localStorage.setItem(SECONDARY_STORAGE_KEY, String(secondaryCollapsed));
+    } catch (_error) {
+      // 保存できなくても開閉機能自体は継続する。
+    }
+    updateSecondaryToggle();
+  }
+
+  function isSecondaryToggleEvent(event) {
+    return event
+      .composedPath()
+      .some((node) => node && node.id === SECONDARY_TOGGLE_ID);
+  }
+
+  // YouTube 側がボタンまで届く前にイベントを止める場合に備え、
+  // document_start で登録したキャプチャリスナーから操作する。
+  document.addEventListener(
+    "pointerdown",
+    (event) => {
+      if (!isSecondaryToggleEvent(event)) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      toggleSecondary();
+    },
+    true,
+  );
+  document.addEventListener(
+    "click",
+    (event) => {
+      if (!isSecondaryToggleEvent(event)) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      // Enter / Space による click は pointerdown が発生しない。
+      if (event.detail === 0) toggleSecondary();
+    },
+    true,
+  );
+
+  function positionSecondaryToggle(button, watch, secondary) {
+    if (secondaryCollapsed) {
+      button.style.left = "auto";
+      button.style.right = "0";
+      return;
+    }
+
+    const secondaryRect = secondary.getBoundingClientRect();
+    const watchRect = watch.getBoundingClientRect();
+    const boundary = Math.max(watchRect.left, secondaryRect.left);
+    button.style.left = `${Math.round(boundary - button.offsetWidth)}px`;
+    button.style.right = "auto";
+  }
+
+  function updateSecondaryToggle() {
+    const watch = document.querySelector("ytd-watch-flexy");
+    const secondary = getWatchSecondary(watch);
+    let button = document.getElementById(SECONDARY_TOGGLE_ID);
+
+    if (!settings.enabled || !watch || !secondary) {
+      if (button) button.remove();
+      if (watch) watch.removeAttribute(SECONDARY_COLLAPSED_ATTR);
+      if (secondary) {
+        secondary.hidden = false;
+        secondary.style.removeProperty("display");
+      }
+      return;
+    }
+
+    watch.toggleAttribute(SECONDARY_COLLAPSED_ATTR, secondaryCollapsed);
+    if (secondaryCollapsed) {
+      // YouTube が後から付与するインラインスタイルよりも確実に優先する。
+      secondary.hidden = true;
+      secondary.style.setProperty("display", "none", "important");
+    } else {
+      secondary.hidden = false;
+      secondary.style.removeProperty("display");
+    }
+
+    if (!button) {
+      button = document.createElement("button");
+      button.id = SECONDARY_TOGGLE_ID;
+      button.type = "button";
+      document.body.appendChild(button);
+    }
+
+    const icon = secondaryCollapsed ? "‹" : "›";
+    if (button.textContent !== icon) button.textContent = icon;
+    button.title = secondaryCollapsed ? "関連動画を表示" : "関連動画を隠す";
+    button.setAttribute("aria-label", button.title);
+    button.setAttribute("aria-expanded", String(!secondaryCollapsed));
+    button.hidden = !!document.fullscreenElement;
+    positionSecondaryToggle(button, watch, secondary);
   }
 
   // ------------------------------------------------------------------
@@ -295,6 +459,7 @@
     requestAnimationFrame(() => {
       scheduled = false;
       filterAll();
+      updateSecondaryToggle();
     });
   }
 
@@ -339,6 +504,7 @@
   function refresh() {
     applyStyle();
     filterAll();
+    updateSecondaryToggle();
   }
 
   const storage =
@@ -375,7 +541,10 @@
     document.addEventListener("DOMContentLoaded", () => {
       applyStyle();
       filterAll();
+      updateSecondaryToggle();
     });
   }
+  window.addEventListener("resize", () => requestAnimationFrame(updateSecondaryToggle));
+  document.addEventListener("fullscreenchange", updateSecondaryToggle);
   init();
 })();
