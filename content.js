@@ -35,6 +35,8 @@
     "ytd-playlist-video-renderer",
     "ytd-reel-item-renderer",
     "ytd-rich-grid-media",
+    "ytm-shorts-lockup-view-model-v2",
+    "ytm-shorts-lockup-view-model",
   ];
 
   const TITLE_SELECTORS = [
@@ -67,6 +69,7 @@
     "ytd-rich-shelf-renderer",
     "ytd-shelf-renderer",
     "ytd-horizontal-card-list-renderer",
+    "grid-shelf-view-model",
   ];
 
   const SECTION_TITLE_SELECTORS = [
@@ -199,6 +202,11 @@
       ytd-reel-shelf-renderer,
       ytd-rich-shelf-renderer[is-shorts],
       ytd-reel-item-renderer,
+      ytm-shorts-lockup-view-model-v2,
+      ytm-shorts-lockup-view-model,
+      grid-shelf-view-model:has(ytm-shorts-lockup-view-model-v2),
+      grid-shelf-view-model:has(ytm-shorts-lockup-view-model),
+      grid-shelf-view-model:has(a[href^="/shorts/"]),
       ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]) {
         display: none !important;
       }
@@ -381,7 +389,13 @@
     if (
       section.matches("ytd-reel-shelf-renderer, ytd-rich-shelf-renderer[is-shorts]") ||
       section.querySelector(
-        'ytd-reel-item-renderer, ytd-rich-shelf-renderer[is-shorts], a[href^="/shorts/"]',
+        [
+          "ytd-reel-item-renderer",
+          "ytd-rich-shelf-renderer[is-shorts]",
+          "ytm-shorts-lockup-view-model-v2",
+          "ytm-shorts-lockup-view-model",
+          'a[href^="/shorts/"]',
+        ].join(","),
       )
     ) {
       return true;
@@ -394,11 +408,21 @@
     return /ゲームルーム|YouTube\s*でプレイ|Playables/i.test(text);
   }
 
+  function hideElement(element, reason) {
+    // YouTube 側が display を再設定しても復活しないよう優先度を上げる。
+    element.style.setProperty("display", "none", "important");
+    element.setAttribute("data-ytgc-hidden", reason);
+  }
+
+  function restoreElement(element) {
+    element.style.removeProperty("display");
+    element.removeAttribute("data-ytgc-hidden");
+  }
+
   function filterCard(card) {
     // 既に判定済みで、設定が変わっていなければスキップ
     if (settings.hideShorts && isShortsCard(card)) {
-      card.style.display = "none";
-      card.setAttribute("data-ytgc-hidden", "ytgc-shorts");
+      hideElement(card, "ytgc-shorts");
       return;
     }
 
@@ -406,8 +430,7 @@
       !settings.hideShorts &&
       card.getAttribute("data-ytgc-hidden") === "ytgc-shorts"
     ) {
-      card.style.display = "";
-      card.removeAttribute("data-ytgc-hidden");
+      restoreElement(card);
     }
 
     const title = getText(card, TITLE_SELECTORS);
@@ -418,15 +441,13 @@
       matchesBlock(title, settings.blockTitleKeywords) ||
       matchesBlock(channel, settings.blockChannelKeywords);
     if (hit) {
-      card.style.display = "none";
-      card.setAttribute("data-ytgc-hidden", hit);
+      hideElement(card, hit);
     } else if (
       card.getAttribute("data-ytgc-hidden") !== null &&
       card.getAttribute("data-ytgc-hidden") !== "ytgc-shorts"
     ) {
       // 過去に非表示にしたが、設定変更で対象外になった場合は復帰
-      card.style.display = "";
-      card.removeAttribute("data-ytgc-hidden");
+      restoreElement(card);
     }
   }
 
@@ -439,19 +460,16 @@
         (reason === "ytgc-game-room" && !settings.hideGameRoom) ||
         (reason === "ytgc-shorts-section" && !settings.hideShorts);
       if (shouldRestore) {
-        section.style.display = "";
-        section.removeAttribute("data-ytgc-hidden");
+        restoreElement(section);
       }
     });
 
     const sections = root.querySelectorAll(SECTION_RENDERERS.join(","));
     sections.forEach((section) => {
       if (settings.hideShorts && isShortsSection(section)) {
-        section.style.display = "none";
-        section.setAttribute("data-ytgc-hidden", "ytgc-shorts-section");
+        hideElement(section, "ytgc-shorts-section");
       } else if (settings.hideGameRoom && isGameRoomSection(section)) {
-        section.style.display = "none";
-        section.setAttribute("data-ytgc-hidden", "ytgc-game-room");
+        hideElement(section, "ytgc-game-room");
       }
     });
   }
@@ -461,8 +479,7 @@
       // フィルタ無効化: 過去に隠したものを戻す
       if (root.querySelectorAll) {
         root.querySelectorAll("[data-ytgc-hidden]").forEach((c) => {
-          c.style.display = "";
-          c.removeAttribute("data-ytgc-hidden");
+          restoreElement(c);
         });
       }
       return;
