@@ -11,6 +11,13 @@ YouTube の一覧表示をカスタマイズする Firefox / Chrome 拡張機能
 
 おまけ: ショート動画/ゲームルームの非表示、大文字・小文字の区別。
 
+## インストール
+
+- Edge / Chrome:
+  https://chromewebstore.google.com/detail/plenjlmcihblnnjhakfakkmkdnmhpbkn?utm_source=item-share-cb
+- Firefox:
+  https://addons.mozilla.org/ja/firefox/addon/youtube-grid-layout-customizer/
+
 ## ファイル構成
 
 ```
@@ -21,7 +28,7 @@ options.js      … 設定ページのロジック
 icons/icon.svg  … アイコン
 ```
 
-## インストール（開発中の一時読み込み）
+## 開発中の一時読み込み
 
 ### Firefox
 
