@@ -12,6 +12,7 @@
     hideShorts: false,
     hideGameRoom: false,
     enableSubtitles: true,
+    hideOtherTopics: false,
   };
 
   const api = typeof browser !== "undefined" ? browser : chrome;
@@ -30,6 +31,7 @@
       $("hideShorts").checked = !!s.hideShorts;
       $("hideGameRoom").checked = !!s.hideGameRoom;
       $("enableSubtitles").checked = !!s.enableSubtitles;
+      $("hideOtherTopics").checked = !!s.hideOtherTopics;
       $("blockTitleKeywords").value = toLines(s.blockTitleKeywords);
       $("blockChannelKeywords").value = toLines(s.blockChannelKeywords);
     });
@@ -63,6 +65,7 @@
       hideShorts: $("hideShorts").checked,
       hideGameRoom: $("hideGameRoom").checked,
       enableSubtitles: $("enableSubtitles").checked,
+      hideOtherTopics: $("hideOtherTopics").checked,
       blockTitleKeywords: fromLines("blockTitleKeywords"),
       blockChannelKeywords: fromLines("blockChannelKeywords"),
     };

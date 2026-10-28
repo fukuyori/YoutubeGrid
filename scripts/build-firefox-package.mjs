@@ -3,7 +3,6 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
-  rmSync,
   writeFileSync,
 } from "node:fs";
 import { dirname, join } from "node:path";
@@ -16,9 +15,6 @@ const packageDir = join(dist, "firefox");
 const packageZip = join(dist, "youtube-grid-customizer-firefox.zip");
 const packageXpi = join(dist, "youtube-grid-customizer-firefox.xpi");
 
-rmSync(packageDir, { recursive: true, force: true });
-rmSync(packageZip, { force: true });
-rmSync(packageXpi, { force: true });
 mkdirSync(packageDir, { recursive: true });
 
 for (const file of ["content.js", "page-bridge.js", "options.html", "options.js"]) {
@@ -44,10 +40,24 @@ if (!existsSync(join(packageDir, "icons", "icon-128.png"))) {
   throw new Error("Firefox package requires icons/icon-128.png");
 }
 
-execFileSync("zip", ["-r", packageZip, "."], {
-  cwd: packageDir,
-  stdio: "inherit",
-});
+execFileSync(
+  "zip",
+  [
+    "-r",
+    "-FS",
+    packageZip,
+    "content.js",
+    "page-bridge.js",
+    "icons",
+    "manifest.json",
+    "options.html",
+    "options.js",
+  ],
+  {
+    cwd: packageDir,
+    stdio: "inherit",
+  },
+);
 
 cpSync(packageZip, packageXpi);
 

@@ -21,6 +21,7 @@
     hideShorts: false,
     hideGameRoom: false,
     enableSubtitles: true, // 字幕の一括表示・ダウンロード機能
+    hideOtherTopics: false,
   };
 
   let settings = { ...DEFAULTS };
@@ -136,6 +137,121 @@
         width: 100% !important;
         max-width: none !important;
         margin: 0 !important;
+      }
+
+      /* ---- サムネイル下をタイトル、チャンネル、公開時期の順で縦に表示 ---- */
+      ytd-rich-item-renderer .yt-lockup-metadata-view-model-wiz__metadata,
+      ytd-rich-item-renderer .yt-content-metadata-view-model-wiz__metadata,
+      ytd-rich-item-renderer .ytContentMetadataViewModelMetadata,
+      ytd-rich-item-renderer yt-content-metadata-view-model,
+      ytd-rich-grid-media .yt-lockup-metadata-view-model-wiz__metadata,
+      ytd-rich-grid-media .yt-content-metadata-view-model-wiz__metadata,
+      ytd-rich-grid-media .ytContentMetadataViewModelMetadata,
+      ytd-rich-grid-media yt-content-metadata-view-model,
+      yt-lockup-metadata-view-model .ytLockupMetadataViewModelMetadata,
+      ytd-video-renderer .yt-lockup-metadata-view-model-wiz__metadata,
+      ytd-video-renderer .yt-content-metadata-view-model-wiz__metadata,
+      ytd-video-renderer .ytContentMetadataViewModelMetadata,
+      ytd-video-renderer yt-content-metadata-view-model,
+      ytd-rich-grid-media ytd-video-meta-block #metadata,
+      ytd-video-meta-block #metadata {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 2px !important;
+        min-width: 0 !important;
+      }
+      ytd-rich-item-renderer .ytContentMetadataViewModelMetadataRow,
+      ytd-rich-item-renderer .yt-content-metadata-view-model-wiz__metadata-row,
+      ytd-rich-item-renderer .yt-lockup-metadata-view-model-wiz__metadata-row,
+      ytd-rich-grid-media .ytContentMetadataViewModelMetadataRow,
+      ytd-rich-grid-media .yt-content-metadata-view-model-wiz__metadata-row,
+      ytd-rich-grid-media .yt-lockup-metadata-view-model-wiz__metadata-row,
+      ytd-rich-grid-media ytd-video-meta-block #byline-container,
+      ytd-rich-grid-media ytd-video-meta-block #metadata-line,
+      ytd-video-renderer .ytContentMetadataViewModelMetadataRow,
+      ytd-video-renderer .yt-content-metadata-view-model-wiz__metadata-row,
+      ytd-video-renderer .yt-lockup-metadata-view-model-wiz__metadata-row,
+      ytd-video-meta-block #metadata-line {
+        display: block !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+      ytd-rich-grid-media ytd-video-meta-block #metadata-line span:first-child,
+      ytd-video-renderer ytd-video-meta-block #metadata-line span:first-child,
+      ytd-grid-video-renderer ytd-video-meta-block #metadata-line span:first-child,
+      ytd-compact-video-renderer ytd-video-meta-block #metadata-line span:first-child {
+        display: none !important;
+      }
+      yt-lockup-metadata-view-model.ytLockupMetadataViewModelHost .ytContentMetadataViewModelMetadataRow {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        column-gap: 4px !important;
+        row-gap: 2px !important;
+      }
+      yt-lockup-metadata-view-model.ytLockupMetadataViewModelHost .ytContentMetadataViewModelMetadataRow > .ytContentMetadataViewModelMetadataText:first-child {
+        order: 0 !important;
+        flex: 0 1 auto !important;
+        min-width: 0 !important;
+      }
+      yt-lockup-metadata-view-model.ytLockupMetadataViewModelHost .ytContentMetadataViewModelMetadataRow > .ytContentMetadataViewModelIcon {
+        order: 1 !important;
+      }
+      yt-lockup-metadata-view-model.ytLockupMetadataViewModelHost .ytContentMetadataViewModelMetadataRow > .ytContentMetadataViewModelMetadataTextLastPart {
+        order: 2 !important;
+        flex: 0 0 100% !important;
+      }
+      yt-lockup-metadata-view-model.ytLockupMetadataViewModelHost .ytContentMetadataViewModelMetadataRow > .ytContentMetadataViewModelDelimiter,
+      yt-lockup-metadata-view-model.ytLockupMetadataViewModelHost .ytContentMetadataViewModelMetadataRow > .ytContentMetadataViewModelLeadingIcon,
+      yt-lockup-metadata-view-model.ytLockupMetadataViewModelHost .ytContentMetadataViewModelMetadataRow > .ytContentMetadataViewModelMetadataText:not(:first-child):not(.ytContentMetadataViewModelMetadataTextLastPart) {
+        display: none !important;
+      }
+      ytd-rich-item-renderer .ytContentMetadataViewModelMetadataRow:nth-child(2) > :not(:last-child),
+      ytd-rich-item-renderer .yt-content-metadata-view-model-wiz__metadata-row:nth-child(2) > :not(:last-child),
+      ytd-rich-grid-media .ytContentMetadataViewModelMetadataRow:nth-child(2) > :not(:last-child),
+      ytd-rich-grid-media .yt-content-metadata-view-model-wiz__metadata-row:nth-child(2) > :not(:last-child),
+      ytd-video-renderer .ytContentMetadataViewModelMetadataRow:nth-child(2) > :not(:last-child),
+      ytd-video-renderer .yt-content-metadata-view-model-wiz__metadata-row:nth-child(2) > :not(:last-child) {
+        display: none !important;
+      }
+      ytd-rich-item-renderer .yt-lockup-metadata-view-model-wiz__title,
+      ytd-rich-item-renderer .yt-content-metadata-view-model-wiz__title,
+      ytd-rich-item-renderer .ytLockupMetadataViewModelTitle,
+      ytd-rich-item-renderer #video-title,
+      ytd-rich-item-renderer #video-title-link,
+      ytd-rich-grid-media .yt-lockup-metadata-view-model-wiz__title,
+      ytd-rich-grid-media .yt-content-metadata-view-model-wiz__title,
+      ytd-rich-grid-media .ytLockupMetadataViewModelTitle,
+      ytd-rich-grid-media #video-title,
+      ytd-rich-grid-media #video-title-link,
+      ytd-rich-grid-media yt-formatted-string#video-title,
+      ytd-rich-grid-media a#video-title-link,
+      ytd-video-renderer .yt-lockup-metadata-view-model-wiz__title,
+      ytd-video-renderer .yt-content-metadata-view-model-wiz__title,
+      ytd-video-renderer .ytLockupMetadataViewModelTitle,
+      ytd-video-renderer #video-title,
+      ytd-video-renderer #video-title-link,
+      ytd-grid-video-renderer #video-title,
+      ytd-compact-video-renderer #video-title {
+        display: block !important;
+        max-width: 100% !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+      yt-lockup-metadata-view-model.ytLockupMetadataViewModelHost .ytLockupMetadataViewModelHeadingReset,
+      yt-lockup-metadata-view-model.ytLockupMetadataViewModelHost .ytLockupMetadataViewModelTitle,
+      yt-lockup-metadata-view-model.ytLockupMetadataViewModelHost .ytLockupMetadataViewModelTitle > .ytAttributedStringHost {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
       }
 
       /* ---- 動画ページ右側（関連動画）の開閉 ---- */
@@ -744,6 +860,7 @@
     return (
       settings.hideShorts ||
       settings.hideGameRoom ||
+      settings.hideOtherTopics ||
       settings.blockTitleKeywords.length > 0 ||
       settings.blockChannelKeywords.length > 0
     );
@@ -797,6 +914,10 @@
     element.removeAttribute("data-ytgc-hidden");
   }
 
+  function isOtherTopicsSection(section) {
+    return sectionTitle(section).includes("その他のトピック");
+  }
+
   function filterCard(card) {
     // 既に判定済みで、設定が変わっていなければスキップ
     if (settings.hideShorts && isShortsCard(card)) {
@@ -836,7 +957,8 @@
       const reason = section.getAttribute("data-ytgc-hidden");
       const shouldRestore =
         (reason === "ytgc-game-room" && !settings.hideGameRoom) ||
-        (reason === "ytgc-shorts-section" && !settings.hideShorts);
+        (reason === "ytgc-shorts-section" && !settings.hideShorts) ||
+        (reason === "ytgc-other-topics" && !settings.hideOtherTopics);
       if (shouldRestore) {
         restoreElement(section);
       }
@@ -848,6 +970,8 @@
         hideElement(section, "ytgc-shorts-section");
       } else if (settings.hideGameRoom && isGameRoomSection(section)) {
         hideElement(section, "ytgc-game-room");
+      } else if (settings.hideOtherTopics && isOtherTopicsSection(section)) {
+        hideElement(section, "ytgc-other-topics");
       }
     });
   }

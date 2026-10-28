@@ -4,7 +4,7 @@ Firefox Add-ons (AMO) 登録用の確認メモです。
 
 ## 提出ファイル
 
-- [ ] バージョンが `manifest.json` で `0.2.0` になっている。
+- [ ] バージョンが `manifest.json` で `0.7.0` になっている。
 - [ ] Firefox 用パッケージを作成済み。
 
 ```sh
@@ -21,7 +21,7 @@ node scripts/build-firefox-package.mjs
 ## 動作確認
 
 - [ ] Firefox の `about:debugging#/runtime/this-firefox` で一時読み込みできる。
-- [ ] 設定ページに `v0.2.0` が表示される。
+- [ ] 設定ページに `v0.7.0` が表示される。
 - [ ] 「拡張機能を有効にする」の ON/OFF が効く。
 - [ ] グリッド列数が YouTube のホーム/登録チャンネル等に反映される。
 - [ ] 検索結果の列数が反映される。
@@ -30,18 +30,23 @@ node scripts/build-firefox-package.mjs
 - [ ] 「大文字・小文字を区別する」がキーワード判定に反映される。
 - [ ] 「ショート動画を一覧に表示しない」で Shorts セクションと Shorts 動画カードが消える。
 - [ ] 「ゲームルームを表示しない」でゲームルームのセクションが消える。
+- [ ] 「その他のトピックを表示しない」で該当セクションが消える。
+- [ ] 動画カードの情報がタイトル、チャンネル名、公開時期の順に表示される。
+- [ ] 動画ページの字幕表示、検索、シーク、コピー、ダウンロードが動作する。
+- [ ] 字幕機能の ON/OFF 設定が反映される。
 - [ ] 設定保存後、開いている YouTube タブへ反映される。
 
 ## AMO 入力内容
 
 - [ ] Name: `YouTube Grid Customizer`
-- [ ] Summary: YouTube の一覧表示をカスタマイズし、列数変更・キーワード非表示・Shorts/ゲームルーム非表示を行う拡張機能。
+- [ ] Summary: YouTube の一覧表示をカスタマイズし、列数変更・キーワード非表示・Shorts/セクション非表示を行う拡張機能。
 - [ ] Description:
   - YouTube ホーム/登録チャンネル等のグリッド列数を変更できる。
   - 検索結果を複数列表示にできる。
   - タイトル/チャンネル名のキーワードで動画を非表示にできる。
   - Shorts セクション/Shorts 動画カードを非表示にできる。
-  - ゲームルームのセクションを非表示にできる。
+  - ゲームルーム/その他のトピックのセクションを非表示にできる。
+  - 動画カードの情報をタイトル、チャンネル名、公開時期の順に表示できる。
 - [ ] Category: Productivity など、用途に合うカテゴリを選択する。
 - [ ] Support email / Support website を入力する。
 - [ ] License を選択する。
@@ -50,11 +55,11 @@ node scripts/build-firefox-package.mjs
 - [ ] Detailed version notes に今回の変更内容を具体的に書く。
 
 ```text
-Version 0.2.0:
-- Added an option to hide Shorts sections and Shorts video cards in YouTube lists.
-- Added an option to hide Game Room sections.
-- Added the extension version display to the options page.
-- Updated the options page labels and submission/privacy documentation.
+Version 0.7.0:
+- Added an option to hide the "Other topics" section.
+- Displayed video card titles, channel names, and upload times on separate lines.
+- Preserved the subtitle display and download tools from the previous version.
+- Updated the options page and submission documentation.
 ```
 
 - [ ] 審査担当者へのメモに、テスト用アカウントの要否を書く。
@@ -63,11 +68,13 @@ Version 0.2.0:
 No test account is required. The main features can be tested on public YouTube pages and search results.
 
 Suggested test steps:
-1. Open the options page and confirm that v0.2.0 is shown.
+1. Open the options page and confirm that v0.7.0 is shown.
 2. Change the grid column count and search result column count.
 3. Add title/channel keywords and confirm matching videos are hidden.
 4. Enable "ショート動画を一覧に表示しない" and confirm Shorts sections/cards are hidden.
 5. Enable "ゲームルームを表示しない" and confirm Game Room sections are hidden when YouTube shows them.
+6. Enable "その他のトピックを表示しない" and confirm the matching section is hidden.
+7. Open a video and verify the subtitle tools.
 ```
 
 ## 権限説明

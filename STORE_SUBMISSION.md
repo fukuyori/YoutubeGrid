@@ -49,6 +49,9 @@ Features:
 - Hide videos when the title or channel name contains keywords you choose.
 - Optionally hide Shorts sections and Shorts video cards in lists.
 - Optionally hide Game Room sections.
+- Optionally hide the "Other topics" section.
+- Display video titles, channel names, and upload times on separate lines.
+- Show, search, seek, copy, and download subtitles from a video page.
 - Keep settings in Chrome extension storage.
 
 The extension only runs on youtube.com pages. It does not load remote code, show ads, or send your settings to the developer.
@@ -77,7 +80,7 @@ Customize YouTube list and search result layouts, including column counts and ke
 `storage`:
 
 ```text
-Used to save the user's layout and keyword filter settings, such as grid column count, search result column count, hidden keywords, Shorts visibility preference, and Game Room visibility preference.
+Used to save the user's layout and keyword filter settings, such as grid column count, search result column count, hidden keywords, Shorts visibility preference, Game Room visibility preference, and topic section visibility preference.
 ```
 
 Host access:
@@ -123,5 +126,7 @@ Use screenshots that show the actual YouTube grid/search result customization an
 - Confirm title/channel keyword hiding works.
 - Confirm Shorts hiding removes Shorts sections and Shorts video cards in lists.
 - Confirm Game Room hiding removes Game Room sections.
+- Confirm the Other topics option hides the matching section.
+- Confirm subtitle display, search, seeking, copy, and download work.
 - Confirm the ZIP contains no private files, source control folders, or unrelated assets.
 - Upload the ZIP, complete Store Listing, Privacy, Distribution, and Test Instructions, then submit for review.
