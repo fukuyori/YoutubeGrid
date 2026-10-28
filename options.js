@@ -11,6 +11,7 @@
     caseSensitive: false,
     hideShorts: false,
     hideGameRoom: false,
+    enableSubtitles: true,
   };
 
   const api = typeof browser !== "undefined" ? browser : chrome;
@@ -28,6 +29,7 @@
       $("caseSensitive").checked = !!s.caseSensitive;
       $("hideShorts").checked = !!s.hideShorts;
       $("hideGameRoom").checked = !!s.hideGameRoom;
+      $("enableSubtitles").checked = !!s.enableSubtitles;
       $("blockTitleKeywords").value = toLines(s.blockTitleKeywords);
       $("blockChannelKeywords").value = toLines(s.blockChannelKeywords);
     });
@@ -60,6 +62,7 @@
       caseSensitive: $("caseSensitive").checked,
       hideShorts: $("hideShorts").checked,
       hideGameRoom: $("hideGameRoom").checked,
+      enableSubtitles: $("enableSubtitles").checked,
       blockTitleKeywords: fromLines("blockTitleKeywords"),
       blockChannelKeywords: fromLines("blockChannelKeywords"),
     };

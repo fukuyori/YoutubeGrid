@@ -12,7 +12,7 @@ rmSync(packageDir, { recursive: true, force: true });
 rmSync(packageZip, { force: true });
 mkdirSync(packageDir, { recursive: true });
 
-for (const file of ["content.js", "options.html", "options.js"]) {
+for (const file of ["content.js", "page-bridge.js", "options.html", "options.js"]) {
   cpSync(join(root, file), join(packageDir, file));
 }
 
